@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WAD>
+    <results>
+        <type>float</type>
+        <omschrijving/>
+        <volgnummer>1</volgnummer>
+        <niveau/>
+        <grootheid/>
+        <eenheid>pixels</eenheid>
+        <waarde>256</waarde>
+        <grens_kritisch_onder/>
+        <grens_kritisch_boven/>
+        <grens_acceptabel_onder/>
+        <grens_acceptabel_boven/>
+    </results>
+    <results>
+        <type>char</type>
+        <niveau/>
+        <omschrijving/>
+        <volgnummer>2</volgnummer>
+        <waarde> Intrinsiek_Tc99m</waarde>
+    </results>
+</WAD>

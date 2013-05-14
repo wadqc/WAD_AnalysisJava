@@ -1,0 +1,9 @@
+2013-01-16 08:49:43,158 [main] INFO  module.Module                             : inputfile = c:\WAD-software\Data\input.xml
+2013-01-16 08:49:43,815 [main] DEBUG module.analyse.Analyse                    : patientid   = 20120917
+2013-01-16 08:49:43,815 [main] DEBUG module.analyse.Analyse                    : patientnaam = QC SYMBIA T6^^^^
+2013-01-16 08:49:43,815 [main] DEBUG module.analyse.Analyse                    : studydescription = INTRINSIC VERIFICATION QC STUDY
+2013-01-16 08:49:43,815 [main] DEBUG module.analyse.Analyse                    : aantal series = 2
+2013-01-16 08:49:43,815 [main] DEBUG module.analyse.Analyse                    : Seriesdescription van serie 1 bevat 'SAVE SCREEN'
+2013-01-16 08:49:43,815 [main] DEBUG module.analyse.Analyse                    : Serie 1, Instance 1 c:\WAD-software\Data\datafile1.dcm
+2013-01-16 08:49:44,018 [main] DEBUG module.analyse.Analyse                    :    Height = 256
+2013-01-16 08:49:44,018 [main] DEBUG module.analyse.Analyse                    :    PatientName (0010,0010) =  Intrinsiek_99mTc
