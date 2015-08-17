@@ -5,7 +5,6 @@
 package module.analyse;
 
 import ij.*;
-import ij.io.*;
 import ij.process.*;
 import ij.util.*;
 import java.awt.Rectangle;
@@ -36,7 +35,7 @@ public class Analyse {
         log.debug("aantal series = "+ inputfile.getPatient().getStudy().getSeriesList().size());
         
         for (int i=0; i<inputfile.getPatient().getStudy().getSeriesList().size();i++) {
-            if ( inputfile.getPatient().getStudy().getSeries(i).getDescription().contains("SAVE SCREEN") ) {
+            if ( inputfile.getPatient().getStudy().getSeries(i).getDescription().toUpperCase().contains("SAVE SCREEN") ) {
                 log.debug("Seriesdescription van serie " + (i+1) + " bevat 'SAVE SCREEN'");
                 
                 for (int j=0;j<inputfile.getPatient().getStudy().getSeries(i).getInstanceList().size();j++) {
