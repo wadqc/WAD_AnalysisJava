@@ -36,10 +36,13 @@ public class AnalyseModuleConfigFile {
     
     public AnalyseModuleConfigFile(String filename){
         
-        analyseModuleConfigFile = new File(filename);
-        parseXmlFile(analyseModuleConfigFile);
-        parseDocument();
-   
+        if(!filename.isEmpty()) {
+            analyseModuleConfigFile = new File(filename);
+            if(analyseModuleConfigFile.isFile()) {
+                parseXmlFile(analyseModuleConfigFile);
+                parseDocument();
+            }
+        }
     }
    
     
