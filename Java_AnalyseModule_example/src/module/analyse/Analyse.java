@@ -4,10 +4,8 @@
  */
 package module.analyse;
 
-import ij.*;
-import ij.process.*;
-import ij.util.*;
-import java.awt.Rectangle;
+import com.pixelmed.dicom.*;
+import com.pixelmed.display.SourceImage;
 import module.wad.xml.AnalyseModuleConfigFile;
 import module.wad.xml.AnalyseModuleInputFile;
 import module.wad.xml.AnalyseModuleResultFile;
@@ -19,61 +17,72 @@ import org.apache.commons.logging.LogFactory;
 
 public class Analyse {
 
-    private ImagePlus IPL_image;    // the imagej image variable
-    private ImageProcessor ip;      // the ImageProcessor variable to manipulate the pixels   
-    private Log log = LogFactory.getLog(Analyse.class);
+    private static final AttributeList list = new AttributeList();
+    private final Log log = LogFactory.getLog(Analyse.class);
     
     
     public Analyse(AnalyseModuleInputFile inputfile, AnalyseModuleConfigFile configfile, AnalyseModuleResultFile resultfile){
-        
-        // selecteer de files die we willen analyseren (in dit voorbeeld de serie die "SAVE SCREEN" bevat)
-        String analyseFile = "";
         
         log.debug("patientid   = "+ inputfile.getPatient().getId());
         log.debug("patientnaam = "+ inputfile.getPatient().getName());
         log.debug("studydescription = "+ inputfile.getPatient().getStudy().getDescription());
         log.debug("aantal series = "+ inputfile.getPatient().getStudy().getSeriesList().size());
         
-        for (int i=0; i<inputfile.getPatient().getStudy().getSeriesList().size();i++) {
-            if ( inputfile.getPatient().getStudy().getSeries(i).getDescription().toUpperCase().contains("SAVE SCREEN") ) {
-                log.debug("Seriesdescription van serie " + (i+1) + " bevat 'SAVE SCREEN'");
-                
-                for (int j=0;j<inputfile.getPatient().getStudy().getSeries(i).getInstanceList().size();j++) {
-                    analyseFile = inputfile.getPatient().getStudy().getSeries(i).getInstance(j).getFilename();
-                    log.debug("Serie " + (i+1) + ", Instance " + (j+1) + " " + analyseFile);
-                    
-                }
-            }
-        }
-        
+        // neem de eerste instance van de eerste serie van de eerste studie
+        String analyseFile = inputfile.getPatient().getStudy().getSeries(0).getInstance(0).getFilename();
         
         // gewenste files inlezen, analyse uitvoeren en resultaten toevoegen aan results.xml
-        ReadFile(analyseFile); 
+        String dicomFilePath = analyseFile;
+        System.out.println("Analyzing:" + dicomFilePath);
         
-        // doe iets met de file (hier: lees de image-hoogte en patientnaam uit)
-        ip = IPL_image.getProcessor();    //get access to the pixels
-        log.debug("   Height = " + ip.getHeight());
-        Rectangle roi = ip.getRoi();
-        log.debug("   PatientName (0010,0010) = " + DicomTools.getTag(IPL_image, "0010,0010"));
-        
-        ResultsFloat hoogte = new ResultsFloat();
-        hoogte.setVolgnummer("1");
-        hoogte.setWaarde(Integer.toString(ip.getHeight()));
-        hoogte.setEenheid("pixels");
-        resultfile.add(hoogte);
-        
-        // voeg een resultaat toe aan de resultfile
-        ResultsChar patientnaam = new ResultsChar();
-        patientnaam.setVolgnummer("2");
-        patientnaam.setWaarde(DicomTools.getTag(IPL_image, "0010,0010"));
-        resultfile.add(patientnaam);
-    }
+        try {
+            list.read(dicomFilePath);
+            SourceImage img = new com.pixelmed.display.SourceImage(list);
+            OtherWordAttribute pixelAttribute = (OtherWordAttribute)(list.get(TagFromName.PixelData));
+            short[] data = pixelAttribute.getShortValues();
+            int max=0;
+            for (int i = 1; i < data.length; i++) {
+               if (data[i] > max) {
+                    max = data[i];
+               }
+            }
+            System.out.println("Patient naam = " + Attribute.getDelimitedStringValuesOrEmptyString(list,TagFromName.PatientName));
+            System.out.println("Hoogte plaatje = " + img.getHeight());
+            System.out.println("Maximale pixelwaarde = " + max);
+            
+            
+            // doe iets met de file (hier: lees de image-hoogte en patientnaam uit)
+                
+            ResultsFloat hoogte = new ResultsFloat();
+            hoogte.setVolgnummer("1");
+            hoogte.setNiveau("2");
+            hoogte.setOmschrijving("hoogte van de dicom-image");
+            hoogte.setGrootheid("hoogte");
+            hoogte.setWaarde(Integer.toString(img.getHeight()));
+            hoogte.setEenheid("pixels");
+            resultfile.add(hoogte);
 
-    
-    private void ReadFile(String filename){
-        IPL_image = IJ.openImage(filename);
+            ResultsFloat maxpixel = new ResultsFloat();
+            maxpixel.setVolgnummer("2");
+            maxpixel.setNiveau("1");
+            maxpixel.setOmschrijving("maxpixel");
+            maxpixel.setGrootheid("pixelwaarde");
+            maxpixel.setWaarde(Integer.toString(max));
+            maxpixel.setEenheid("a.u.");
+            resultfile.add(maxpixel);
+            
+            // voeg een resultaat toe aan de resultfile
+            ResultsChar patientnaam = new ResultsChar();
+            patientnaam.setVolgnummer("3");
+            patientnaam.setNiveau("2");
+            patientnaam.setOmschrijving("Patient naam");
+            patientnaam.setWaarde(Attribute.getDelimitedStringValuesOrEmptyString(list,TagFromName.PatientName));
+            resultfile.add(patientnaam);
+            
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        
     }
-    
-
     
 }
